@@ -1,0 +1,28 @@
+nav {
+  //background-color: red;
+}
+
+nav {
+  max-width: 30rem;
+  display: flex;
+  justify-content: space-around;
+  margin: 1rem auto 2em;
+}
+
+nav a {
+  color: dodgerblue;
+  text-decoration: none;
+}
+
+nav a:link {
+}
+
+nav a:visited {
+}
+
+nav a:hover {
+  font-weight: bold;
+}
+
+nav a:active {
+}

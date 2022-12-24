@@ -1,0 +1,18 @@
+.search-container {
+  display: flex;
+  align-items: center;
+
+  .label {
+    font-weight: bold;
+    flex: 1;
+  }
+
+
+  .search-box {
+    flex: 5;
+  }
+}
+
+.results-table {
+
+}

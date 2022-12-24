@@ -1,0 +1,24 @@
+
+.flex-container {
+    display: flex;
+}
+
+.flex-container aside {
+    flex: 1;
+}
+
+.flex-container section {
+    flex: 2;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.flex-container aside img {
+    max-width: 100%;
+}
+
+@media screen and (max-width: 600px) {
+    .flex-container {
+        flex-direction: column;
+    }
+}

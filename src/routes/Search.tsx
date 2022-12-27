@@ -102,13 +102,17 @@ function Search() {
       },
     } = data;
 
-    const handleMoreResults = async () => {
+    const handleMoreResults: MoreResults = (() => {
       if (hasNextPage) {
-        await fetchMore({
-          variables: { cursor: endCursor },
-        });
+        return async () => {
+          await fetchMore({
+            variables: { cursor: endCursor },
+          });
+        };
+      } else {
+        return undefined;
       }
-    };
+    })();
 
     const cats: Cat[] = edges.map((edge) => edge.node);
 

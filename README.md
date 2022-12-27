@@ -9,10 +9,12 @@ Users may search through them.
 ## Architecture
 ```mermaid
 flowchart LR
+    user((User))
     hasura[Hasura]
     apollo[Apollo]
     react[React]
     db[(PostgresQL)]
+    user --> react
     subgraph Browser
     react --> apollo 
     end

@@ -21,7 +21,7 @@ services:
     build: .
     ports:
       - '3000:3000'
-    command: "npm start"
+    command: "npm run start"
     volumes:
       - '${PWD}/src:/usr/local/app/src'
       - '${PWD}/public:/usr/local/app/public'

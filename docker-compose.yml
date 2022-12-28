@@ -22,3 +22,8 @@ services:
     ports:
       - '3000:3000'
     command: "npm start"
+    volumes:
+      - '${PWD}/src:/usr/local/app/src'
+      - '${PWD}/public:/usr/local/app/public'
+      - '${PWD}/codegen.ts:/usr/local/app/codegen.ts'
+      - '${PWD}/tsconfig.json:/usr/local/app/tsconfig.json'

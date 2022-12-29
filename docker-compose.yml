@@ -20,12 +20,12 @@ services:
       FLASK_DEBUG: True
       POSTGRES_PASSWORD: mysecretpassword
   web:
-    build: .
+    build: ./frontend/
     ports:
       - '3000:3000'
     command: "npm run start"
     volumes:
-      - '${PWD}/src:/usr/local/app/src'
-      - '${PWD}/public:/usr/local/app/public'
-      - '${PWD}/codegen.ts:/usr/local/app/codegen.ts'
-      - '${PWD}/tsconfig.json:/usr/local/app/tsconfig.json'
+      - '${PWD}/frontend/src:/usr/local/app/src'
+      - '${PWD}/frontend/public:/usr/local/app/public'
+      - '${PWD}/frontend/codegen.ts:/usr/local/app/codegen.ts'
+      - '${PWD}/frontend/tsconfig.json:/usr/local/app/tsconfig.json'

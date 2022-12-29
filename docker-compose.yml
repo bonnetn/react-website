@@ -19,7 +19,7 @@ services:
     environment:
       FLASK_DEBUG: True
       POSTGRES_PASSWORD: mysecretpassword
-  web:
+  frontend:
     build: ./frontend/
     ports:
       - '3000:3000'
@@ -29,3 +29,11 @@ services:
       - '${PWD}/frontend/public:/usr/local/app/public'
       - '${PWD}/frontend/codegen.ts:/usr/local/app/codegen.ts'
       - '${PWD}/frontend/tsconfig.json:/usr/local/app/tsconfig.json'
+  backend:
+    build: ./backend/
+    ports:
+      - '4000:4000'
+    command: "npm start"
+    volumes:
+      - '${PWD}/backend/src:/usr/local/app/src'
+      - '${PWD}/backend/schema.graphql:/usr/local/app/schema.graphql'

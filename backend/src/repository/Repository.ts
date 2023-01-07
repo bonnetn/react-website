@@ -12,11 +12,13 @@ export type Owner = {
 };
 
 export interface Repository {
-  fetchOneCat(uuid: String): Promise<Cat | null>;
+  fetchCat(uuid: String): Promise<Cat | null>;
 
   searchCats(
     queryString: String,
-    limit: number,
-    after: number | null
+    first: number | null,
+    after: number | null,
+    last: number | null,
+    before: number | null
   ): Promise<Cat[]>;
 }

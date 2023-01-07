@@ -16,7 +16,7 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          catConnection: relayStylePagination(),
+          searchCats: relayStylePagination(),
         },
       },
     },

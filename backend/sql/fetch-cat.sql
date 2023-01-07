@@ -1,4 +1,4 @@
-CREATE FUNCTION pg_temp.search_cats(query TEXT)
+CREATE FUNCTION pg_temp.fetch_cat(catUuid TEXT)
     RETURNS TABLE
             (
                 id         INT,
@@ -20,7 +20,6 @@ SELECT cats.id     AS id,
 FROM cats
          INNER JOIN owners ON owners.id = cats.owner_id
 
-WHERE cats.name ILIKE '%' || query || '%'
+WHERE cats.uuid::text = catUuid
 $$
     LANGUAGE SQL;
-

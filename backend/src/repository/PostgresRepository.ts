@@ -1,62 +1,53 @@
-import pgPromise from "pg-promise";
 import { Cat, Repository } from "./Repository";
-
-namespace Query {
-  export const fetchOneCat = sql("../sql/fetch-one-cat.sql");
-  export const searchCats = sql("../sql/search-cats.sql");
-
-  function sql(path: string): pgPromise.QueryFile {
-    const queryFile = new pgPromise.QueryFile(path, {
-      minify: true,
-    });
-    queryFile.prepare();
-    return queryFile;
-  }
-}
-
-export type Configuration = {
-  host: string;
-  port: number;
-  database: string;
-  user: string;
-  password: string;
-};
+import { fetchCatQuery, queries, searchCatsQuery } from "./Query.js";
+import PG from "pg";
 
 export class PostgresRepository implements Repository {
-  readonly #db: pgPromise.IDatabase<{}>;
+  readonly #db: PG.Pool;
 
-  constructor(config: Configuration) {
-    const initOptions = {};
-    const cn = {
-      ...config,
-      max: 30, // use up to 30 connections
-    };
-    const pgp = pgPromise(initOptions);
-    this.#db = pgp(cn);
+  constructor(pool: PG.Pool) {
+    pool.on("connect", this.registerQueries);
+    this.#db = pool;
   }
 
-  async fetchOneCat(uuid: string): Promise<Cat | null> {
-    const query = new pgPromise.ParameterizedQuery({
-      text: Query.fetchOneCat,
-      values: [uuid],
-    });
-    const result = await this.#db.oneOrNone(query);
+  private async registerQueries(client: PG.Client): Promise<void> {
+    for (const { name, content } of queries) {
+      console.log(`Registering ${name}`);
+      await client.query(content);
+    }
+  }
 
-    return result.map(this.#catMapper);
+  async fetchCat(uuid: string): Promise<Cat | null> {
+    const { rows } = await this.#db.query(fetchCatQuery, [uuid]);
+    const result = rows.map(this.#catMapper);
+    return result.at(0) ?? null;
   }
 
   async searchCats(
     queryString: string,
-    limit: number,
-    after: number | null
+    first: number | null,
+    after: number | null,
+    last: number | null,
+    before: number | null
   ): Promise<Cat[]> {
-    const query = new pgPromise.ParameterizedQuery({
-      text: Query.searchCats,
-      values: [queryString, after, limit],
-    });
-    const result = await this.#db.any(query);
-
-    return result.map(this.#catMapper);
+    const r = await this.#db.query("EXPLAIN ANALYZE " + searchCatsQuery, [
+      queryString,
+      first,
+      after,
+      last,
+      before,
+    ]);
+    for (const l of r.rows) {
+      console.log(l["QUERY PLAN"]);
+    }
+    const { rows } = await this.#db.query(searchCatsQuery, [
+      queryString,
+      first,
+      after,
+      last,
+      before,
+    ]);
+    return rows.map(this.#catMapper);
   }
 
   #catMapper({ id, uuid, name, age, owner_uuid, owner_name }): Cat {

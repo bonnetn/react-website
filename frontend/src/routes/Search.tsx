@@ -14,8 +14,8 @@ import { SearchCatsQuery } from "../__generated__/graphql";
 type MoreResults = (() => Promise<void>) | undefined;
 
 const SEARCH_CATS = gql(`
-  query SearchCats($cursor: String) {
-    catConnection(first: 20, after: $cursor) {
+  query SearchCats($query: String!, $cursor: String) {
+    searchCats(query: $query, first: 20, after: $cursor) {
       edges {
         node {
           id
@@ -64,14 +64,13 @@ function Search() {
     SEARCH_CATS,
     {
       variables: {
-        // search: query,
+        query: query,
       },
       notifyOnNetworkStatusChange: true,
     }
   );
   useEffect(() => {
-    refetch({});
-    // refetch({ search: query });
+    refetch({ query: query });
   }, [refetch, query]);
 
   const fetchingMore = networkStatus === NetworkStatus.fetchMore;
@@ -98,7 +97,7 @@ function Search() {
       ];
 
     const {
-      catConnection: {
+      searchCats: {
         edges,
         pageInfo: { hasNextPage, endCursor },
       },

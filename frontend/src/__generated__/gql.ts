@@ -13,13 +13,13 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel-plugin for production.
  */
 const documents = {
-    "\n  query SearchCats($cursor: String) {\n    catConnection(first: 20, after: $cursor) {\n      edges {\n        node {\n          id\n          age\n          name\n          owner {\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n": types.SearchCatsDocument,
+    "\n  query SearchCats($query: String!, $cursor: String) {\n    searchCats(query: $query, first: 20, after: $cursor) {\n      edges {\n        node {\n          id\n          age\n          name\n          owner {\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n": types.SearchCatsDocument,
 };
 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query SearchCats($cursor: String) {\n    catConnection(first: 20, after: $cursor) {\n      edges {\n        node {\n          id\n          age\n          name\n          owner {\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n"): (typeof documents)["\n  query SearchCats($cursor: String) {\n    catConnection(first: 20, after: $cursor) {\n      edges {\n        node {\n          id\n          age\n          name\n          owner {\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query SearchCats($query: String!, $cursor: String) {\n    searchCats(query: $query, first: 20, after: $cursor) {\n      edges {\n        node {\n          id\n          age\n          name\n          owner {\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n"): (typeof documents)["\n  query SearchCats($query: String!, $cursor: String) {\n    searchCats(query: $query, first: 20, after: $cursor) {\n      edges {\n        node {\n          id\n          age\n          name\n          owner {\n            name\n          }\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n"];
 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.

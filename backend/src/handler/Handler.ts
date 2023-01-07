@@ -48,7 +48,22 @@ export class Handler {
 
   resolvers: Resolvers = {
     Query: {
-      catConnection: async (_, { first, after }, contextValue) => {
+      searchCats: async (
+        _,
+        { query, first, after, last, before },
+        contextValue
+      ) => {
+        if (first !== undefined && last !== undefined) {
+          throw new GraphQLError(
+            "setting both 'first' and 'last' argument is not supported",
+            {
+              extensions: {
+                code: "UNSUPPORTED_ARGUMENT_FIRST_AND_LAST_SET",
+              },
+            }
+          );
+        }
+
         const limit = (() => {
           if (first === undefined) {
             return defaultLimit;
@@ -88,7 +103,13 @@ export class Handler {
           return a;
         })();
 
-        const cats = await this.#repository.searchCats("cha", limit, afterNum);
+        const cats = await this.#repository.searchCats(
+          query,
+          limit,
+          afterNum,
+          null,
+          null
+        );
 
         const edges: CatEdge[] = cats.map(({ id, uuid, name, age, owner }) => {
           return {
@@ -118,6 +139,7 @@ export class Handler {
           edges: edges,
           pageInfo: {
             hasNextPage,
+            hasPreviousPage: false,
             endCursor,
           },
         };

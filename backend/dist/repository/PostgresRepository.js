@@ -10,46 +10,44 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _PostgresRepository_instances, _PostgresRepository_db, _PostgresRepository_catMapper;
-import pgPromise from "pg-promise";
-var Query;
-(function (Query) {
-    Query.fetchOneCat = sql("../sql/fetch-one-cat.sql");
-    Query.searchCats = sql("../sql/search-cats.sql");
-    function sql(path) {
-        const queryFile = new pgPromise.QueryFile(path, {
-            minify: true,
-        });
-        queryFile.prepare();
-        return queryFile;
-    }
-})(Query || (Query = {}));
+import { fetchCatQuery, queries, searchCatsQuery } from "./Query.js";
 export class PostgresRepository {
-    constructor(config) {
+    constructor(pool) {
         _PostgresRepository_instances.add(this);
         _PostgresRepository_db.set(this, void 0);
-        const initOptions = {};
-        const cn = {
-            ...config,
-            max: 30, // use up to 30 connections
-        };
-        const pgp = pgPromise(initOptions);
-        __classPrivateFieldSet(this, _PostgresRepository_db, pgp(cn), "f");
+        pool.on("connect", this.registerQueries);
+        __classPrivateFieldSet(this, _PostgresRepository_db, pool, "f");
     }
-    async fetchOneCat(uuid) {
-        const query = new pgPromise.ParameterizedQuery({
-            text: Query.fetchOneCat,
-            values: [uuid],
-        });
-        const result = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").oneOrNone(query);
-        return result.map(__classPrivateFieldGet(this, _PostgresRepository_instances, "m", _PostgresRepository_catMapper));
+    async registerQueries(client) {
+        for (const { name, content } of queries) {
+            console.log(`Registering ${name}`);
+            await client.query(content);
+        }
     }
-    async searchCats(queryString, limit, after) {
-        const query = new pgPromise.ParameterizedQuery({
-            text: Query.searchCats,
-            values: [queryString, after, limit],
-        });
-        const result = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").any(query);
-        return result.map(__classPrivateFieldGet(this, _PostgresRepository_instances, "m", _PostgresRepository_catMapper));
+    async fetchCat(uuid) {
+        const { rows } = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").query(fetchCatQuery, [uuid]);
+        const result = rows.map(__classPrivateFieldGet(this, _PostgresRepository_instances, "m", _PostgresRepository_catMapper));
+        return result.at(0) ?? null;
+    }
+    async searchCats(queryString, first, after, last, before) {
+        const r = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").query("EXPLAIN ANALYZE " + searchCatsQuery, [
+            queryString,
+            first,
+            after,
+            last,
+            before,
+        ]);
+        for (const l of r.rows) {
+            console.log(l["QUERY PLAN"]);
+        }
+        const { rows } = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").query(searchCatsQuery, [
+            queryString,
+            first,
+            after,
+            last,
+            before,
+        ]);
+        return rows.map(__classPrivateFieldGet(this, _PostgresRepository_instances, "m", _PostgresRepository_catMapper));
     }
 }
 _PostgresRepository_db = new WeakMap(), _PostgresRepository_instances = new WeakSet(), _PostgresRepository_catMapper = function _PostgresRepository_catMapper({ id, uuid, name, age, owner_uuid, owner_name }) {

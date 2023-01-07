@@ -5,6 +5,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -44,17 +45,22 @@ export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor?: Maybe<Scalars['String']>;
   hasNextPage: Scalars['Boolean'];
+  hasPreviousPage: Scalars['Boolean'];
+  startCursor?: Maybe<Scalars['String']>;
 };
 
 export type Query = {
   __typename?: 'Query';
-  catConnection: CatConnection;
+  searchCats: CatConnection;
 };
 
 
-export type QueryCatConnectionArgs = {
+export type QuerySearchCatsArgs = {
   after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+  query: Scalars['String'];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -180,11 +186,13 @@ export type OwnerResolvers<ContextType = Context, ParentType extends ResolversPa
 export type PageInfoResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
   endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  catConnection?: Resolver<ResolversTypes['CatConnection'], ParentType, ContextType, Partial<QueryCatConnectionArgs>>;
+  searchCats?: Resolver<ResolversTypes['CatConnection'], ParentType, ContextType, RequireFields<QuerySearchCatsArgs, 'query'>>;
 }>;
 
 export type Resolvers<ContextType = Context> = ResolversObject<{

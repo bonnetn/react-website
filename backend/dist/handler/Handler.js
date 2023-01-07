@@ -76,7 +76,7 @@ export class Handler {
                         }
                         return a;
                     })();
-                    const cats = await __classPrivateFieldGet(this, _Handler_repository, "f").searchCats(query, limit, afterNum, null, null);
+                    const cats = await __classPrivateFieldGet(this, _Handler_repository, "f").searchCats(query, { state: "first", value: limit }, afterNum, null);
                     const edges = cats.map(({ id, uuid, name, age, owner }) => {
                         return {
                             node: {

@@ -1,5 +1,10 @@
-import { Cat, Repository } from "./Repository";
-import { fetchCatQuery, queries, searchCatsQuery } from "./Query.js";
+import { Cat, Limit, Repository } from "./Repository";
+import {
+  fetchCatQuery,
+  queries,
+  searchCatsBackwardQuery,
+  searchCatsForwardQuery,
+} from "./Query.js";
 import PG from "pg";
 
 export class PostgresRepository implements Repository {
@@ -23,28 +28,36 @@ export class PostgresRepository implements Repository {
     return result.at(0) ?? null;
   }
 
+  #getSearchCatQuery(limit: Limit): string {
+    switch (limit.state) {
+      case "first":
+        return searchCatsForwardQuery;
+      case "last":
+        return searchCatsBackwardQuery;
+    }
+  }
+
   async searchCats(
     queryString: string,
-    first: number | null,
+    limit: Limit,
     after: number | null,
-    last: number | null,
     before: number | null
   ): Promise<Cat[]> {
-    const r = await this.#db.query("EXPLAIN ANALYZE " + searchCatsQuery, [
+    const sql = this.#getSearchCatQuery(limit);
+    console.log(sql);
+    const r = await this.#db.query("EXPLAIN ANALYZE " + sql, [
       queryString,
-      first,
+      limit.value,
       after,
-      last,
       before,
     ]);
     for (const l of r.rows) {
       console.log(l["QUERY PLAN"]);
     }
-    const { rows } = await this.#db.query(searchCatsQuery, [
+    const { rows } = await this.#db.query(sql, [
       queryString,
-      first,
+      limit.value,
       after,
-      last,
       before,
     ]);
     return rows.map(this.#catMapper);

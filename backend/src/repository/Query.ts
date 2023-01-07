@@ -1,4 +1,3 @@
-import { paginate } from "./Paginator.js";
 import { opendirSync, readFileSync } from "fs";
 
 type QueryFunction = {
@@ -8,15 +7,10 @@ type QueryFunction = {
 
 export const queries: QueryFunction[] = await readSql("sql/");
 
-export const searchCatsQuery: string = paginate(
-  "SELECT * FROM pg_temp.search_cats($1)",
-  {
-    first: "$2",
-    after: "$3",
-    last: "$4",
-    before: "$5",
-  }
-);
+export const searchCatsForwardQuery: string =
+  "SELECT * FROM pg_temp.search_cats_forward($1::text, $2::int, $3::int, $4::int);";
+export const searchCatsBackwardQuery: string =
+  "SELECT * FROM pg_temp.search_cats_backward($1::text, $2::int, $3::int, $4::int);";
 
 export const fetchCatQuery: string = "SELECT * FROM pg_temp.fetch_cat($1)";
 

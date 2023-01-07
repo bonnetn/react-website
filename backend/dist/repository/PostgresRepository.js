@@ -9,8 +9,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _PostgresRepository_instances, _PostgresRepository_db, _PostgresRepository_catMapper;
-import { fetchCatQuery, queries, searchCatsQuery } from "./Query.js";
+var _PostgresRepository_instances, _PostgresRepository_db, _PostgresRepository_getSearchCatQuery, _PostgresRepository_catMapper;
+import { fetchCatQuery, queries, searchCatsBackwardQuery, searchCatsForwardQuery, } from "./Query.js";
 export class PostgresRepository {
     constructor(pool) {
         _PostgresRepository_instances.add(this);
@@ -29,28 +29,35 @@ export class PostgresRepository {
         const result = rows.map(__classPrivateFieldGet(this, _PostgresRepository_instances, "m", _PostgresRepository_catMapper));
         return result.at(0) ?? null;
     }
-    async searchCats(queryString, first, after, last, before) {
-        const r = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").query("EXPLAIN ANALYZE " + searchCatsQuery, [
+    async searchCats(queryString, limit, after, before) {
+        const sql = __classPrivateFieldGet(this, _PostgresRepository_instances, "m", _PostgresRepository_getSearchCatQuery).call(this, limit);
+        console.log(sql);
+        const r = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").query("EXPLAIN ANALYZE " + sql, [
             queryString,
-            first,
+            limit.value,
             after,
-            last,
             before,
         ]);
         for (const l of r.rows) {
             console.log(l["QUERY PLAN"]);
         }
-        const { rows } = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").query(searchCatsQuery, [
+        const { rows } = await __classPrivateFieldGet(this, _PostgresRepository_db, "f").query(sql, [
             queryString,
-            first,
+            limit.value,
             after,
-            last,
             before,
         ]);
         return rows.map(__classPrivateFieldGet(this, _PostgresRepository_instances, "m", _PostgresRepository_catMapper));
     }
 }
-_PostgresRepository_db = new WeakMap(), _PostgresRepository_instances = new WeakSet(), _PostgresRepository_catMapper = function _PostgresRepository_catMapper({ id, uuid, name, age, owner_uuid, owner_name }) {
+_PostgresRepository_db = new WeakMap(), _PostgresRepository_instances = new WeakSet(), _PostgresRepository_getSearchCatQuery = function _PostgresRepository_getSearchCatQuery(limit) {
+    switch (limit.state) {
+        case "first":
+            return searchCatsForwardQuery;
+        case "last":
+            return searchCatsBackwardQuery;
+    }
+}, _PostgresRepository_catMapper = function _PostgresRepository_catMapper({ id, uuid, name, age, owner_uuid, owner_name }) {
     const owner = { uuid: owner_uuid, name: owner_name };
     return { id, uuid, name, age, owner };
 };

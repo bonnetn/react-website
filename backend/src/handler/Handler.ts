@@ -105,9 +105,8 @@ export class Handler {
 
         const cats = await this.#repository.searchCats(
           query,
-          limit,
+          { state: "first", value: limit },
           afterNum,
-          null,
           null
         );
 

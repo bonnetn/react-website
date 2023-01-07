@@ -1,12 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  gql,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./routes/Root";
@@ -21,7 +16,7 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          search_cats_connection: relayStylePagination(),
+          catConnection: relayStylePagination(),
         },
       },
     },

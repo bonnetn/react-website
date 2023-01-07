@@ -2,7 +2,7 @@ import { CodegenConfig } from "@graphql-codegen/cli";
 import { graphqlURI } from "./src/config";
 
 const config: CodegenConfig = {
-  schema: graphqlURI,
+  schema: "../backend/schema.graphql",
   documents: ["src/**/*.tsx"],
   generates: {
     "./src/__generated__/": {

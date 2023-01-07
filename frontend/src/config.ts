@@ -1,3 +1,3 @@
-const graphqlURI = "http://localhost:8080/v1beta1/relay";
+const graphqlURI = "http://localhost:4000";
 
 export { graphqlURI };

@@ -3,18 +3,19 @@ import Template from "../components/Template";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import { gql } from "../__generated__";
 import SearchBox from "../components/SearchBox";
-import CatsList, { Cat, Ready, State } from "../components/CatsList";
+import CatsList, { Cat, State } from "../components/CatsList";
 import MoreButton from "../components/MoreButton";
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
+import { SearchCatsQuery } from "../__generated__/graphql";
 
 // If the user can fetch more results, then this is a function.
 // Otherwise, undefined.
 type MoreResults = (() => Promise<void>) | undefined;
 
 const SEARCH_CATS = gql(`
-  query SearchCats($cursor: String, $search: String!) {
-    search_cats_connection(first: 20, after: $cursor, args: {search: $search}, order_by: {id: asc}) {
+  query SearchCats($cursor: String) {
+    catConnection(first: 20, after: $cursor) {
       edges {
         node {
           id
@@ -63,14 +64,15 @@ function Search() {
     SEARCH_CATS,
     {
       variables: {
-        search: query,
+        // search: query,
       },
       notifyOnNetworkStatusChange: true,
     }
   );
   useEffect(() => {
-    refetch({ search: query });
-  }, [query]);
+    refetch({});
+    // refetch({ search: query });
+  }, [refetch, query]);
 
   const fetchingMore = networkStatus === NetworkStatus.fetchMore;
 
@@ -96,7 +98,7 @@ function Search() {
       ];
 
     const {
-      search_cats_connection: {
+      catConnection: {
         edges,
         pageInfo: { hasNextPage, endCursor },
       },

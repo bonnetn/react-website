@@ -1,7 +1,5 @@
 import React from "react";
 import "./Root.scss";
-import NavBar from "../components/NavBar";
-import Header from "../components/Header";
 import Template from "../components/Template";
 import picture from "./pig.jpeg";
 

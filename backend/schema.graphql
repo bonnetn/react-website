@@ -1,19 +1,31 @@
 type Query {
-  books: [Book]
+    catConnection(first: Int, after: String): CatConnection!
 }
 
-type Book {
-  title: String
-  author: String
+type CatConnection {
+    edges: [CatEdge!]!
+    pageInfo: PageInfo!
 }
 
-type AddBookMutationResponse {
-  code: String!
-  success: Boolean!
-  message: String!
-  book: Book
+type CatEdge {
+    node: Cat!
+    cursor: String
 }
 
-type Mutation {
-  addBook(title: String, author: String): AddBookMutationResponse
+type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: String
 }
+
+type Cat {
+    id: String!
+    name: String!
+    age: Int!
+    owner: Owner!
+}
+
+type Owner {
+    id: String!
+    name: String!
+}
+
